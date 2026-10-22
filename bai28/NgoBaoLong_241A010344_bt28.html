@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Trò chơi Kiểm tra Phản Xạ Click Chuột</title>
+  <style>
+  
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+   
+    .dashboard {
+      width: 600px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 18px;
+      font-weight: bold;
+      color: #2c3e50;
+      margin-bottom: 12px;
+    }
+
+    #arena {
+      width: 600px;
+      height: 400px;
+      background-color: #ffffff;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      cursor: crosshair;
+    }
+
+   
+    #target {
+      width: 40px;
+      height: 40px;
+      background-color: #e63946;
+      border-radius: 50%;
+      position: absolute; 
+      display: none;       
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(230, 57, 70, 0.4);
+    }
+
+  
+    #btn-start {
+      margin-top: 15px;
+      padding: 10px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #ffffff;
+      background-color: #007bff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    #btn-start:hover {
+      background-color: #0056b3;
+    }
+
+    #btn-start:disabled {
+      background-color: #a0aec0;
+      cursor: not-allowed;
+    }
+
+    
+    #message-box {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #007bff;
+      padding: 16px 28px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Kiểm Tra Tốc Độ Phản Xạ Chuột</h2>
+
+
+  <div class="dashboard">
+    <div>Điểm: <span id="score">0</span></div>
+    <div>Thời gian: <span id="time">30</span>s</div>
+  </div>
+
+
+  <div id="arena">
+    <div id="target"></div>
+    <div id="message-box"></div>
+  </div>
+
+ 
+  <button id="btn-start">Bắt đầu trò chơi</button>
+
+ 
+  <script>
+    
+    const arena = document.getElementById('arena');
+    const target = document.getElementById('target');
+    const scoreText = document.getElementById('score');
+    const timeText = document.getElementById('time');
+    const btnStart = document.getElementById('btn-start');
+    const messageBox = document.getElementById('message-box');
+
+    let score = 0;
+    let timeLeft = 30;
+    let countdownTimer = null; 
+    let targetTimer = null;    
+
+
+    function moveTarget() {
+      const arenaWidth = 600;
+      const arenaHeight = 400;
+      const targetSize = 40; // 40px
+
+      
+      const randomX = Math.floor(Math.random() * (arenaWidth - targetSize));
+      const randomY = Math.floor(Math.random() * (arenaHeight - targetSize));
+
+      target.style.left = randomX + 'px';
+      target.style.top = randomY + 'px';
+    }
+
+   
+    function startTargetInterval() {
+      // Xóa bộ đếm cũ nếu có
+      clearInterval(targetTimer);
+
+      
+      targetTimer = setInterval(function() {
+        moveTarget();
+      }, 1000);
+    }
+
+    
+    function startGame() {
+     
+      score = 0;
+      timeLeft = 30;
+      scoreText.innerText = score;
+      timeText.innerText = timeLeft;
+
+      messageBox.style.display = 'none';
+
+    
+      btnStart.disabled = true;
+
+      
+      target.style.display = 'block';
+      moveTarget();
+      startTargetInterval();
+
+      clearInterval(countdownTimer);
+      countdownTimer = setInterval(function() {
+        timeLeft--;
+        timeText.innerText = timeLeft;
+
+      
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function endGame() {
+      
+      clearInterval(countdownTimer);
+      clearInterval(targetTimer);
+
+      
+      target.style.display = 'none';
+      btnStart.disabled = false;
+
+      
+      messageBox.innerHTML = `Hết giờ!<br>Tổng điểm của bạn: <span style="color:#e63946;">${score}</span>`;
+      messageBox.style.display = 'block';
+    }
+
+   
+    target.addEventListener('click', function() {
+   
+      score++;
+      scoreText.innerText = score;
+
+      
+      moveTarget();
+
+     
+      startTargetInterval();
+    });
+
+    
+    btnStart.addEventListener('click', startGame);
+  </script>
+</body>
+</html>
